@@ -31,6 +31,23 @@ Requirements:
 - Return the count as a number.
 */
 
-const palindromeCounter = (text, minLength) => {};
+const palindromeCounter = (text, minLength) => {
+    // Limpiar el texto: quitar puntuación y convertir a minúsculas
+    const cleanText = text.replace(/[^a-zA-Z\s]/g, '').toLowerCase();
+
+    // Dividir en palabras
+    const words = cleanText.split(/\s+/);
+
+    // Contar palíndromos válidos
+    let count = 0;
+    for (const word of words) {
+        if (word.length >= minLength && word === word.split('').reverse().join('')) {
+            count++;
+        }
+    }
+
+    return count;
+};
+
 
 module.exports = palindromeCounter;

@@ -24,15 +24,61 @@
  *
  * @returns {Promise<User[]>} A promise that resolves to an array of users who dislike more movies than they like.
  */
+const mocked_api = require("./utils/mocked-api");
 const getUsersWithMoreDislikedMoviesThanLikedMovies = () => {
   // Add your code here
+  //return [];
+  const likedMovies = mocked_api.getLikedMovies().
+    then((likeMovies) => {
+      const likes = new Map();
+      likeMovies.forEach(element => {
+        likes.set(element.userId, element.movies.length);
+      });
 
-  return [];
+      return likes;
+    });
+
+  const dislikeMovies = mocked_api.getDislikedMovies().
+    then((dislike) => {
+      dislikes = new Map();
+      dislike.forEach((element) => {
+        dislikes.set(element.userId, element.movies.length);
+      });
+
+      return dislikes;
+    });
+
+  return new Promise(function (resolve) {
+    //getting values
+    //userList is an array of objects
+    const userInformation = new Map();
+    // const userList = mocked_api.getUsers().
+    //   then((users) => {
+        const allLikesAndDislikes = Promise.all([likedMovies, dislikeMovies, mocked_api.getUsers()]);
+        
+        allLikesAndDislikes.then(function ([likes, dislikes, users]) {
+
+          users.forEach(user => {
+            //console.log(dislikes.get(user.id) > likes.get(user.id));
+            if (dislikes.get(user.id) > likes.get(user.id)){
+              // console.log("------------------------------------------");
+              // console.log(dislikes.get(user.id) > likes.get(user.id));
+              userInformation.set(user.userId,user);
+              console.log("userINformation",user)
+            }
+          });
+        });
+        
+      // });
+
+    resolve(userInformation);
+  });
 };
 
 getUsersWithMoreDislikedMoviesThanLikedMovies().then((users) => {
   console.log("Users with more disliked movies than liked movies:");
+
   users.forEach((user) => {
-    console.log(user, age);
+    console.log(user);
   });
 });
