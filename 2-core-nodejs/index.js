@@ -33,6 +33,11 @@ async function selectMenuOption(answer) {
         }
         case "3": {
             console.log('Edit item by ID');
+            editItemById(3,{
+                name: "my favorite product",
+                price: "23.41",
+                store: "wachime"
+            })
             break;
         }
         case "4": {
@@ -46,7 +51,8 @@ async function selectMenuOption(answer) {
 }
 
 async function addItem(name_, price_, store_) {
-    //read current data and convert to object
+    try{
+            //read current data and convert to object
     const receivedData = JSON.parse(await readFile(outputFilePath));
     //new item object id must be generate auto from last index
     const newItem = {
@@ -57,12 +63,14 @@ async function addItem(name_, price_, store_) {
     }
     //add new item to wishlist items
     receivedData.wishlist.items.push(newItem);
-    //convert to json format
-    //console.log(`Here is the new item ${JSON.stringify(newItem)}`);
-    
 
     //write into to wishlist.json
     writeContentToFile(receivedData);
+
+    }catch(err){
+        console.error("Some error\n ",err.message);
+    } 
+
     return 1;
 }
 //TODO 3: get file results and list it in screen
@@ -93,7 +101,30 @@ function listAllItems(filePath) {
     })();
     return 1;
 }
-//TODO 3: use readFile method
+
+//Edit an existing item
+
+async function editItemById(id,updateContent) {
+
+    try{
+        const receivedData = JSON.parse(await readFile(outputFilePath));
+
+    receivedData.wishlist.items.forEach(item => {
+        if(item.id===id){
+            item.name = updateContent.name;
+            item.price = updateContent.price;
+            item.store = updateContent.store
+
+            console.log(`id${item.id} modified with ${JSON.stringify(item)}`);
+        }
+    });
+    writeContentToFile(receivedData);
+    }catch(err){
+        console.error(err.message);
+    }
+}
+
+//TODO 4: use readFile method
 async function readFile(filePath) {
     const readStream = fs.createReadStream(filePath, { encoding: 'utf8' });
     try {
@@ -113,8 +144,11 @@ async function writeContentToFile(content) {
     console.log(typeof(content));
     try {
       await fs.writeFileSync(outputFilePath, JSON.stringify(content));
+      return 1; //writing good
     } catch (err) {
+
       console.log("Error writing wishlist.json\n",err);
+      return 0;
     }
   }
 
