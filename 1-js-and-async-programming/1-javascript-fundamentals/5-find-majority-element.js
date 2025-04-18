@@ -21,11 +21,14 @@ findMajorityElement([1, 2, 3, 4, 5]); // Expected output: null
 
 const findMajorityElement = (arr) => {
     const n = arr.length;
+
+    //return null if it is empty
     if (n === 0) return null;
 
     const elementCount = new Map();
 
     for (const num of arr) {
+        //(elementCount.get(num) || 0) get previous count if exist and if not put 0 and then sum 1
         elementCount.set(num, (elementCount.get(num) || 0) + 1);
         if (elementCount.get(num) > Math.floor(n / 2)) {
             return num;

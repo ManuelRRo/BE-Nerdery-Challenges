@@ -32,19 +32,18 @@ const getCommonDislikedSubscription = async () => {
 
   //   return user_promise.subscription;
   // }
-
+  //Get api data
   const [users,likes,dislikes] = await Promise.all([
     userPromise,
     likeMoviesPromise,
     dislikeMoviesPromise
   ]);
-  //console.log(users,likes,dislikes,subscriptionByUser);
-
+  //convert to map
   dislikesMap = new Map();
   dislikes.forEach((element) => {
     dislikesMap.set(element.userId, element.movies.length);
   });
-
+//convert to map
   const likesMap = new Map();
   likes.forEach(element => {
     likesMap.set(element.userId, element.movies.length);
