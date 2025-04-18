@@ -31,6 +31,18 @@ Requirements:
 
 */
 
-const factorialChain = (number, lastDigits) => {};
+const factorialChain = (length, lastDigits) => {
+    let factorial = 1;
+    let sumFactorialResult = 0;
+
+    for (let i = 1; i <= length; i++) {
+        factorial *= i;
+        sumFactorialResult += factorial;
+    }
+
+    const sumStr = sumFactorialResult.toString();
+    const lastPart = sumStr.slice(-lastDigits); // take the lastDigits
+    return lastPart.padStart(lastDigits, "0"); // fill with 0 if need it
+};
 
 module.exports = factorialChain;

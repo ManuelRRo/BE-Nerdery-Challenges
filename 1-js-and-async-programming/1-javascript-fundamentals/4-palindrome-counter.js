@@ -31,6 +31,23 @@ Requirements:
 - Return the count as a number.
 */
 
-const palindromeCounter = (text, minLength) => {};
+const palindromeCounter = (text, minLength) => {
+    // all to lower case
+    const cleanText = text.toLowerCase();
+
+    // split words by " "
+    const words = cleanText.split(" ");
+
+    // count palindrome
+    let count = 0;
+    for (const word of words) {
+        if (word.length >= minLength && word === word.split('').reverse().join('')) {
+            count++;
+        }
+    }
+
+    return count;
+};
+
 
 module.exports = palindromeCounter;
