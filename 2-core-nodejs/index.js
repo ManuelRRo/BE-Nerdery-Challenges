@@ -33,7 +33,7 @@ async function selectMenuOption(answer) {
         }
         case "3": {
             console.log('Edit item by ID');
-            editItemById(3,{
+            editItemById(3, {
                 name: "my favorite product",
                 price: "23.41",
                 store: "wachime"
@@ -51,25 +51,25 @@ async function selectMenuOption(answer) {
 }
 
 async function addItem(name_, price_, store_) {
-    try{
-            //read current data and convert to object
-    const receivedData = JSON.parse(await readFile(outputFilePath));
-    //new item object id must be generate auto from last index
-    const newItem = {
-        id: 1,
-        name: name_,
-        price: price_,
-        store: store_
+    try {
+        //read current data and convert to object
+        const receivedData = JSON.parse(await readFile(outputFilePath));
+        //new item object id must be generate auto from last index
+        const newItem = {
+            id: 1,
+            name: name_,
+            price: price_,
+            store: store_
+        }
+        //add new item to wishlist items
+        receivedData.wishlist.items.push(newItem);
+
+        //write into to wishlist.json
+        writeContentToFile(receivedData);
+
+    } catch (err) {
+        console.error("Some error\n ", err.message);
     }
-    //add new item to wishlist items
-    receivedData.wishlist.items.push(newItem);
-
-    //write into to wishlist.json
-    writeContentToFile(receivedData);
-
-    }catch(err){
-        console.error("Some error\n ",err.message);
-    } 
 
     return 1;
 }
@@ -82,7 +82,7 @@ function listAllItems(filePath) {
     //     console.log('--- File chunk end ---');
     // }
     // );
-    (async function(){
+    (async function () {
         try {
             const receivedData = JSON.parse(await readFile(filePath));
             // console.log('--- File chunk start ---');
@@ -91,11 +91,11 @@ function listAllItems(filePath) {
             receivedData.wishlist.items.forEach(item => {
                 console.log(`name: ${item.name}\nprice: ${item.price}\nstore: ${item.store}`);
                 console.log(`*******************************************************************************************`);
-                
+
             });
             // console.log('--- File chunk end ---');
 
-        }catch(err){
+        } catch (err) {
             console.error(err.message);
         }
     })();
@@ -104,22 +104,37 @@ function listAllItems(filePath) {
 
 //Edit an existing item
 
-async function editItemById(id,updateContent) {
+async function editItemById(id, updateContent) {
 
-    try{
+    try {
         const receivedData = JSON.parse(await readFile(outputFilePath));
 
-    receivedData.wishlist.items.forEach(item => {
-        if(item.id===id){
-            item.name = updateContent.name;
-            item.price = updateContent.price;
-            item.store = updateContent.store
+        receivedData.wishlist.items.forEach(item => {
+            if (item.id === id) {
+                item.name = updateContent.name;
+                item.price = updateContent.price;
+                item.store = updateContent.store
 
-            console.log(`id${item.id} modified with ${JSON.stringify(item)}`);
-        }
-    });
-    writeContentToFile(receivedData);
-    }catch(err){
+                console.log(`id${item.id} modified with ${JSON.stringify(item)}`);
+            }
+        });
+        writeContentToFile(receivedData);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+async function deleteItemById(id) {
+
+    try {
+        const receivedData = JSON.parse(await readFile(outputFilePath));
+
+        let itemToDelete;
+
+        receivedData.wishlist.items.forEach(item => { if (item.id === id) {itemToDelete = item.id;}});
+        receivedData.wishlist.items.splice(itemToDelete)
+        writeContentToFile(receivedData);
+    } catch (err) {
         console.error(err.message);
     }
 }
@@ -128,29 +143,29 @@ async function editItemById(id,updateContent) {
 async function readFile(filePath) {
     const readStream = fs.createReadStream(filePath, { encoding: 'utf8' });
     try {
-      for await (const chunk of readStream) {
-        // console.log('--- File chunk start ---');
-        // console.log(chunk);
-        // console.log('--- File chunk end ---');
-        return chunk;
-      }
-      console.log('Finished reading the file.');
+        for await (const chunk of readStream) {
+            // console.log('--- File chunk start ---');
+            // console.log(chunk);
+            // console.log('--- File chunk end ---');
+            return chunk;
+        }
+        console.log('Finished reading the file.');
     } catch (error) {
-      console.error(`Error reading file: ${error.message}`);
+        console.error(`Error reading file: ${error.message}`);
     }
 }
 
 async function writeContentToFile(content) {
-    console.log(typeof(content));
+    console.log(typeof (content));
     try {
-      await fs.writeFileSync(outputFilePath, JSON.stringify(content));
-      return 1; //writing good
+        await fs.writeFileSync(outputFilePath, JSON.stringify(content));
+        return 1; //writing good
     } catch (err) {
 
-      console.log("Error writing wishlist.json\n",err);
-      return 0;
+        console.log("Error writing wishlist.json\n", err);
+        return 0;
     }
-  }
+}
 
 
 main();

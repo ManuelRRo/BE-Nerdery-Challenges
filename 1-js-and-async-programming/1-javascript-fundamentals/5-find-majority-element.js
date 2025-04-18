@@ -19,6 +19,20 @@ findMajorityElement([1, 2, 3, 4, 5]); // Expected output: null
 
 */
 
-const findMajorityElement = (arr) => {};
+const findMajorityElement = (arr) => {
+    const n = arr.length;
+    if (n === 0) return null;
+
+    const elementCount = new Map();
+
+    for (const num of arr) {
+        elementCount.set(num, (elementCount.get(num) || 0) + 1);
+        if (elementCount.get(num) > Math.floor(n / 2)) {
+            return num;
+        }
+    }
+
+    return null;
+};
 
 module.exports = findMajorityElement;

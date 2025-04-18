@@ -33,10 +33,10 @@ Requirements:
 
 const palindromeCounter = (text, minLength) => {
     // Limpiar el texto: quitar puntuación y convertir a minúsculas
-    const cleanText = text.replace(/[^a-zA-Z\s]/g, '').toLowerCase();
+    const cleanText = text.toLowerCase();
 
     // Dividir en palabras
-    const words = cleanText.split(/\s+/);
+    const words = cleanText.split(" ");
 
     // Contar palíndromos válidos
     let count = 0;
