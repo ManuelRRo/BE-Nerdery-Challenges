@@ -62,7 +62,7 @@ export type  Product  =  {
     price: number;
     salePrice: number;
     onSale: boolean;
-    colors: ArrayType<string>;//check how to put Array<T>
+    colors: ArrayType<string>;
     sizes: ArrayType<number>;
     tags: ArrayType<string>;
     images: ArrayType<Image>;
