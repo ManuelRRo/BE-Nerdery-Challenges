@@ -20,14 +20,17 @@ function deepClone<T>(input: T): T {
     
       const initialValue: any = Array.isArray(input) ? [] : {};
     
-      return Object.keys(input).reduce((acc, key) => {
+      return Object.keys(input).reduce((acumulator, key) => {
 
         const typedKey = key as keyof T;
         
-        acc[typedKey] = deepClone((input as any)[typedKey]);
+        acumulator[typedKey] = deepClone((input as any)[typedKey]);
         
-        return acc;
-        
+        return acumulator;
+
       }, initialValue);
       
   }
+
+
+  

@@ -21,8 +21,18 @@
  */
 
 // Add here your solution
-
+type OmitByType<T, U> = {
+    [K in keyof T as T[K] extends U ? never : K]: T[K];
+  };
 // Add here your example
+type MyType = {
+    name: string;
+    count: number;
+    isReadonly: boolean;
+    isEnable: boolean;
+  };
+  
+  type OmitBoolean = OmitByType<MyType, boolean>;
 
 /**
  * Exercise #2: Implement the utility type `If<C, T, F>`, which evaluates a condition `C`
@@ -40,8 +50,12 @@
  */
 
 // Add here your solution
-
+type If<C extends boolean, T, F> = C extends true ? T : F;
 // Add here your example
+type A = If<true, 'a', 'b'>;  // 'a'
+type B = If<false, 'a', 'b'>; // 'b'
+type C = If<true, number, string>; // number
+type D = If<false, number, string>; // string
 
 /**
  * Exercise #3: Recreate the built-in `Readonly<T>` utility type without using it.
@@ -66,9 +80,22 @@
  */
 
 // Add here your solution
-
+type MyReadOnly<T> = {
+    readonly [P in keyof T]: T[P];                                              
+};
 // Add here your example
+ interface Todo {
+   title: string;
+   description: string;
+ }
 
+ const todo: MyReadOnly<Todo> = {
+   title: "Hey",
+   description: "foobar"
+ };
+
+//todo.title = "Hello";       // Error: cannot reassign a readonly property
+//todo.description = "barFoo"; // Error: cannot reassign a readonly property
 /**
  * Exercise #4: Recreate the built-in `ReturnType<T>` utility type without using it.
  *
@@ -88,8 +115,16 @@
  */
 
 // Add here your solution
-
+type MyReturnType<T> = T extends (...args: any) => infer R ? R : any;
 // Add here your example
+const fn = (v: boolean) => {
+      if (v) {
+        return 1;
+      } else {
+        return 2;
+      }
+    };
+    type a = MyReturnType<typeof fn>; // expected to be "1 | 2"
 
 /**
  * Exercise #5: Extract the type inside a wrapped type like `Promise`.
@@ -106,9 +141,11 @@
  */
 
 // Add here your solution
-
+type MyAwaited<T> = T extends Promise<infer U> ? U extends Promise<any> ? MyAwaited<U> : U : never;
 // Add here your example
+ type ExampleType = Promise<string>;
 
+ type Result = MyAwaited<ExampleType>; // expected to be "string"
 /**
  * Exercise 6: Create a utility type `RequiredByKeys<T, K>` that makes specific keys of `T` required.
  *
@@ -133,3 +170,5 @@
 // Add here your solution
 
 // Add here your example
+
+//expected to be: { name: string; age?: number; address?: string }
