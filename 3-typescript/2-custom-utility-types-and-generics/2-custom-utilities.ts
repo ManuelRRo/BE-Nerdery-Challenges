@@ -171,4 +171,4 @@ type MyAwaited<T> = T extends Promise<infer U> ? U extends Promise<any> ? MyAwai
 
 // Add here your example
 
-//expected to be: { name: string; age?: number; address?: string }
+
