@@ -19,7 +19,56 @@
  *
  **/
 
-async function analyzeProductPrices(products: any[]): Promise<any> {}
+import { Product, Brand, EnrichedProduct, BrandInfo } from "./1-types";
+
+async function analyzeProductPrices(products: any[]): Promise<any> {
+
+  type productPick = Pick<Product, "name" | "price" | "onSale">;
+
+  type analyzedProducts = {
+    totalPrice: number;
+    averagePrice: number;
+    mostExpensiveProduct: productPick;
+    cheapestProduct: productPick;
+    onSaleCount: number;
+    averageDiscount: number;
+  }
+
+  let mostExpensiveProduct = products[0] as productPick;
+
+  let cheapestProduct: productPick = products[0] as productPick;
+
+  if (products.length === 0) {
+    throw new Error("Product list cannot be empty")
+  }
+
+  const totalPrice = products.reduce((total, product) => total + product.price, 0);
+
+  const averagePrice = parseFloat((totalPrice / products.length).toFixed(2)); // 2 decimal
+
+  for (const product of products) {
+    if (product.price > mostExpensiveProduct.price) {
+      mostExpensiveProduct = product;
+    }
+    if (product.price < cheapestProduct.price) {
+      cheapestProduct = product;
+    }
+  }
+
+  const onSaleProducts = products.filter(p => p.onSale);
+
+  const onSaleCount = onSaleProducts.length;
+
+  let averageDiscount: number = 0;
+
+  if (onSaleCount > 0) {
+    averageDiscount = onSaleProducts.reduce((sum, p) => sum + ((p.price - (p as any).salePrice) / p.price) * 100, 0);
+  }
+  return {
+    totalPrice, averagePrice, mostExpensiveProduct, cheapestProduct, onSaleCount, averageDiscount
+  }
+
+}
 
 /**
  *  Challenge 2: Build a Product Catalog with Brand Metadata
@@ -36,10 +85,30 @@ async function analyzeProductPrices(products: any[]): Promise<any> {}
  */
 
 async function buildProductCatalog(
-  products: unknown[],
-  brands: unknown[],
-): Promise<unknown[]> {
-  return [];
+  products: Product[],
+  brands: Brand[],
+): Promise<EnrichedProduct[]> {
+
+  const EnrichedProducts: EnrichedProduct[] = new Array();
+
+  const activeBrands = brands.filter((brand) => brand.isActive);
+
+  const activeProducts = products.filter((product) => product.isActive);
+
+  activeProducts.forEach(product => {
+    const brand = activeBrands.find(brand => brand.id === product.brandId)
+    if (brand) {
+      const { id, isActive, ...brandInfo } = brand;
+      const enrichedProduct: EnrichedProduct = {
+        ...product,
+        brandInfo
+      };
+      EnrichedProducts.push(enrichedProduct);
+    }
+  });
+
+  return EnrichedProducts;
+
 }
 
 /**
@@ -57,9 +126,19 @@ async function buildProductCatalog(
  */
 
 async function filterProductsWithOneImage(
-  products: unknown[],
+  products: Product[],
 ): Promise<unknown[]> {
   // Implement the function logic here
+  
+  const filteredProducts = products.filter(product => product.images.length > 0).map((product) => {
 
-  return [];
+    const [firstImage] = product.images;
+    return {
+      
+      images: firstImage ? [firstImage] : [],
+
+    };
+  });
+
+  return filteredProducts;
 }

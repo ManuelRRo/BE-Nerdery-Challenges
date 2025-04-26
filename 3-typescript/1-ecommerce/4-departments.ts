@@ -11,10 +11,27 @@
  * - Add the name of the products in an array called productsNames inside the department object.
  */
 
+import { Department, DepartmentProductInfo, Product } from "./1-types";
+
 async function getDepartmentsWithProductCount(
-  departments: unknown[],
-  products: unknown[],
-): Promise<unknown[]> {
+  departments: Department[],
+  products: Product[],
+): Promise<DepartmentProductInfo[]> {
   // Implement the function logic here
-  return [];
+  return departments.map(function (deapartment) {
+    
+    const relatedProducts = products.filter(
+
+      product => product.departmentId === deapartment.id,
+
+    );
+
+   return {
+      id: deapartment.id,
+      name: deapartment.name,
+      productCount: relatedProducts.length,
+      productsNames: relatedProducts.map(p => p.name),
+    };
+
+  });
 }
