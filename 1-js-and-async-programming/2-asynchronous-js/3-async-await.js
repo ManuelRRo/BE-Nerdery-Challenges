@@ -20,53 +20,44 @@
 const mocked_api = require("./utils/mocked-api");
 const getCommonDislikedSubscription = async () => {
   // Add your code here
-  const userPromise = mocked_api.getUsers();
-  const likeMoviesPromise = mocked_api.getLikedMovies();
-  const dislikeMoviesPromise = mocked_api.getDislikedMovies();
+  const users = await mocked_api.getUsers();
+  const likeMovies = await mocked_api.getLikedMovies();
+  const dislikeMovies = await mocked_api.getDislikedMovies();
 
-  // async function subscriptionByUser(id_user) {
+  const dislikesMap = new Map(
+    dislikeMovies.map(element => [element.userId, element.movies.length])
+  );
 
-  //   let user_promise = await mocked_api.getUserSubscriptionByUserId(id_user);
+  const likesMap = new Map(
+    likeMovies.map(element => [element.userId, element.movies.length])
+  );
 
-  //   console.log("funcion"+typeof(user_promise));
+  const subscriptionPromises = [];
 
-  //   return user_promise.subscription;
-  // }
-  //Get api data
-  const [users,likes,dislikes] = await Promise.all([
-    userPromise,
-    likeMoviesPromise,
-    dislikeMoviesPromise
-  ]);
-  //convert to map
-  dislikesMap = new Map();
-  dislikes.forEach((element) => {
-    dislikesMap.set(element.userId, element.movies.length);
-  });
-//convert to map
-  const likesMap = new Map();
-  likes.forEach(element => {
-    likesMap.set(element.userId, element.movies.length);
-  });
-
-  let basicCount=0,premiumCount=0;
   for (const user of users) {
     if (dislikesMap.get(user.id) > likesMap.get(user.id)) {
-      const value = await mocked_api.getUserSubscriptionByUserId(user.id);
-      if(value.subscription === "Basic"){
-        basicCount++;
-      }else{
-        premiumCount++;
-      }
+      subscriptionPromises.push(mocked_api.getUserSubscriptionByUserId(user.id));
+    }
+  }
+
+  const subscriptionResults = await Promise.all(subscriptionPromises);
+
+  const subscriptionCounts = subscriptionResults.reduce((acc, { subscription }) => {
+    acc[subscription] = (acc[subscription] || 0) + 1;
+    return acc;
+  }, {});
+  
+  let maxSubscription = null;
+  let maxCount = -1;
+  
+  for (const [subscriptionType, count] of Object.entries(subscriptionCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      maxSubscription = subscriptionType;
     }
   }
   
-  if(basicCount > premiumCount){
-    return "Basic"
-  }else{
-    return "Premium"
-  }
-
+  return maxSubscription;
 
 };
 
