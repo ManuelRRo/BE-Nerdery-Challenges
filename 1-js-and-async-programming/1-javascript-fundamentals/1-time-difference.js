@@ -17,43 +17,25 @@ timeDifference(7200, 3400); // Expected output: "01:03:20"
 */
 
 // format HH:MM:SS.
-
+const convertToString = (value) => {
+    return String(value).padStart(2, '0');
+}
 const timeDifference = (a, b) => {
-    let hours,minutes,seconds;
-    let txt_hours,txt_minutes,txt_seconds;
-    const ABSOLUTE_DIFFERENCE = Math.abs(a-b);
-
-    hours = Math.floor(((ABSOLUTE_DIFFERENCE)/3600));
-    minutes = Math.floor(ABSOLUTE_DIFFERENCE / 60) % 60;
-    seconds = ABSOLUTE_DIFFERENCE % 60;
-
-    if(hours === 0){
-        txt_hours = '00';
-    }else if(hours < 10) {
-        txt_hours = '0'+hours;
-    }
-    else{
-        txt_hours = hours;
-    }
-
-    if(seconds === 0){
-        txt_seconds = '00';
-    }else if (seconds < 10){
-        txt_seconds = '0'+ seconds;
-    }else{
-        txt_seconds = seconds;
-    }
-
-    if(minutes===0){
-        txt_minutes = '00';
-    }else if (minutes < 10){
-        txt_minutes = '0'+minutes;
-    }
-    else{
-        txt_minutes = minutes;
-    }
     
-    return `${txt_hours}:${txt_minutes}:${txt_seconds}`;
+    const timeDifferenceInSeconds = Math.abs(a-b);
+    const secondsPerHour = 3600;
+    const secondsPerMinute = 60;
+
+    const hours = Math.floor(timeDifferenceInSeconds / secondsPerHour);
+    const minutes = Math.floor(timeDifferenceInSeconds / secondsPerMinute) % secondsPerMinute;
+    const seconds = timeDifferenceInSeconds % secondsPerMinute;
+
+    const txtHours = convertToString(hours);
+    const txtMinutes = convertToString(minutes)
+    const txtSeconds = convertToString(seconds);
+    
+    
+    return `${txtHours}:${txtMinutes}:${txtSeconds}`;
 };
 
 module.exports = timeDifference;
