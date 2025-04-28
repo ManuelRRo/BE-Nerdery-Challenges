@@ -83,9 +83,9 @@ async function addItem() {
 
         const newItem = {
             id: wishListItems.length + 1,
-            name: name,
-            price: price,
-            store: store
+            name,
+            price,
+            store
         }
 
         wishListItems.push(newItem);
@@ -146,10 +146,10 @@ async function editItemById() {
             const store = await getUserAnswer(`Old Store item: '${oldWishListItem.store}' ~:/ `);
 
             const updatedItem = {
-                id: id,
-                name:name,
-                price:price,
-                store:store,
+                id,
+                name,
+                price,
+                store,
             };
 
             wishListItems[current_index] = updatedItem;
