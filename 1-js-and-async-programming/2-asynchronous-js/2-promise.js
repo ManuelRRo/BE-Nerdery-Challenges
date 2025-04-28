@@ -30,41 +30,32 @@ const getUsersWithMoreDislikedMoviesThanLikedMovies = () => {
   // Add your code here
   const likedMovies = mocked_api.getLikedMovies().
     then((likeMovies) => {
-      const likes = new Map();
-      likeMovies.forEach(element => {
-        likes.set(element.userId, element.movies.length);
-      });
-
+      const likes = new Map(
+        likeMovies.map(likes => {
+          return [likes.userId, likes.movies.length];
+        })
+      );
       return likes;
     });
 
   const dislikeMovies = mocked_api.getDislikedMovies().
-    then((dislike) => {
-      const dislikes = new Map();
-      dislike.forEach((element) => {
-        dislikes.set(element.userId, element.movies.length);
-      });
-
+    then((dislikeMovies) => {
+      const dislikes = new Map(
+        dislikeMovies.map(dislike => {
+          return [dislike.userId, dislike.movies.length]
+        })
+      );
       return dislikes;
     });
 
-  return new Promise(function (resolve) {
+  return Promise.all([likedMovies, dislikeMovies, mocked_api.getUsers()]).then(
+    function ([likes, dislikes, users]) {
 
-    const userInformation = new Map();
+      const userInfo = users.filter(user => dislikes.get(user.id) > likes.get(user.id));
 
-    Promise.all([likedMovies, dislikeMovies, mocked_api.getUsers()]).then(
-      function ([likes, dislikes, users]) {
+      return userInfo;
+    });
 
-        users.forEach(user => {
-
-          if (dislikes.get(user.id) > likes.get(user.id)) {
-            userInformation.set(user.userId, user);
-          }
-
-        });
-        resolve(userInformation);
-      });
-  });
 };
 
 getUsersWithMoreDislikedMoviesThanLikedMovies().then((users) => {

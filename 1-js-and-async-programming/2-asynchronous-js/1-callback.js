@@ -24,24 +24,24 @@
 const makeRequest = require("./utils/make-requests");
 
 const makeRequestWithRetries = (attempts) => {
-  
+
   let attempt = 1;
   const tryRequest = function () {
     makeRequest(attempt, function (err, msg) {
-      
+
       if (err) {
-        
-        if(attempt < attempts){
+        if (attempt < attempts) {
           attempt++;
           tryRequest();
-        }else{
+        } else {
           console.log("All attempts failed");
         }
-      }else{
-        console.log(msg);
+      } else {
+        console.error(err);
       }
+
     });
-    
+
 
   };
 

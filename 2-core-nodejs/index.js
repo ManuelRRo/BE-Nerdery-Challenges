@@ -1,6 +1,8 @@
 import * as readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
+const rl = readline.createInterface({ input, output });
+
 import path from 'path';
 import fs from 'fs';
 
@@ -20,25 +22,20 @@ async function main() {
         console.log('3. Edit item by ID.');
         console.log('4. Delete item by ID.');
         console.log('type "quit" to exit');
+
         const answer = await getUserAnswer("MyWishList:~/ ");
 
-        if (answer === "quit") {
-
-            console.log("bye");
-
-            break;
-        }
-
         await selectMenuOption(answer);
+        
     }
+
+    
 
 }
 
 async function getUserAnswer(msg) {
-    const rl = readline.createInterface({ input, output });
-
     const answer = await rl.question(msg);
-    rl.close();
+    
     return answer;
 }
 
@@ -65,6 +62,10 @@ async function selectMenuOption(answer) {
             await deleteItemById();
             break;
         }
+        case "quit":
+            console.log("bye");
+            process.exit(0);
+            break;
         default: {
             console.log(`The ${answer} option is not available.`);
         }
@@ -134,13 +135,13 @@ async function editItemById() {
 
         const oldWishListItem = wishListItems.find(item => item.id === id);
 
-        const current_index = wishListItems.findIndex(item => item.id === id);
+        const currentIndex = wishListItems.findIndex(item => item.id === id);
 
         if (wishListItems.length === 0) {
             console.log("Sorry no items.")
         }
 
-        if (current_index !== NOT_FOUND) {
+        if (currentIndex !== NOT_FOUND) {
             const name = await getUserAnswer(`Old name item: '${oldWishListItem.name}' ~:/ `);
             const price = parseFloat(await getUserAnswer(`Old Price item: '${oldWishListItem.price}' ~:/ `));
             const store = await getUserAnswer(`Old Store item: '${oldWishListItem.store}' ~:/ `);
@@ -152,7 +153,7 @@ async function editItemById() {
                 store,
             };
 
-            wishListItems[current_index] = updatedItem;
+            wishListItems[currentIndex] = updatedItem;
             
             await writeContentToFile(wishList);
             
