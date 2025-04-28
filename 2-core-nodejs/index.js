@@ -26,16 +26,16 @@ async function main() {
         const answer = await getUserAnswer("MyWishList:~/ ");
 
         await selectMenuOption(answer);
-        
+
     }
 
-    
+
 
 }
 
 async function getUserAnswer(msg) {
     const answer = await rl.question(msg);
-    
+
     return answer;
 }
 
@@ -78,7 +78,7 @@ async function addItem() {
         const price = parseFloat(await getUserAnswer("Price item: ~:/ "));
         const store = await getUserAnswer("Store item: ~:/ ");
 
-        const wishList = JSON.parse(await readFile(outputFilePath));
+        const wishList = await readFile(outputFilePath);
 
         const wishListItems = wishList.wishlist.items;
 
@@ -100,15 +100,17 @@ async function addItem() {
     return 1;
 }
 
-async function listAllItems(filePath) {
+async function listAllItems() {
 
     try {
-        const wishListHeader = JSON.parse(await readFile(outputFilePath)).wishlist.header;
+        const receivedData = await readFile(outputFilePath);
 
-        const wishListItems = JSON.parse(await readFile(filePath)).wishlist.items;
+        const wishListHeader = receivedData.wishlist.header;
 
-        if (wishListItems.length === 0) { 
-            console.log("Sorry no items.") 
+        const wishListItems = receivedData.wishlist.items;
+
+        if (wishListItems.length === 0) {
+            console.log("Sorry no items.")
         }
         else {
             console.log(`*******************************************${wishListHeader}*************************************`);
@@ -129,34 +131,34 @@ async function editItemById() {
     try {
         const id = Number(await getUserAnswer("Item Id: ~:/ "));
 
-        const wishList = JSON.parse(await readFile(outputFilePath));
+        const wishList = await readFile(outputFilePath);
 
         const wishListItems = wishList.wishlist.items;
 
-        const oldWishListItem = wishListItems.find(item => item.id === id);
-
         const currentIndex = wishListItems.findIndex(item => item.id === id);
+
+        const oldWishListItem = wishListItems[currentIndex];
 
         if (wishListItems.length === 0) {
             console.log("Sorry no items.")
         }
 
         if (currentIndex !== NOT_FOUND) {
-            const name = await getUserAnswer(`Old name item: '${oldWishListItem.name}' ~:/ `);
-            const price = parseFloat(await getUserAnswer(`Old Price item: '${oldWishListItem.price}' ~:/ `));
-            const store = await getUserAnswer(`Old Store item: '${oldWishListItem.store}' ~:/ `);
+            const name = await validateInputAnswer(oldWishListItem.name, await getUserAnswer(`Old name item: '${oldWishListItem.name}' ~:/ `));
+            const price = parseFloat(await validateInputAnswer(oldWishListItem.price, await getUserAnswer(`Old Price item: '${oldWishListItem.price}' ~:/ `)));
+            const store = await validateInputAnswer(oldWishListItem.store, await getUserAnswer(`Old Store item: '${oldWishListItem.store}' ~:/ `));
 
             const updatedItem = {
                 id,
                 name,
                 price,
-                store,
+                store
             };
 
             wishListItems[currentIndex] = updatedItem;
-            
+
             await writeContentToFile(wishList);
-            
+
         } else {
             console.log(`\n No item with id: ${id}`);
         }
@@ -166,13 +168,23 @@ async function editItemById() {
     }
 }
 
+async function validateInputAnswer(oldValue, newValue) {
+
+    if (newValue.trim() === '') {
+        return oldValue;
+    }
+    else {
+        return newValue;
+    }
+}
+
 async function deleteItemById() {
 
     try {
 
-        const id = Number(await getUserAnswer("Item Id: ~:/ "));
+        const id = parseInt(await getUserAnswer("Item Id: ~:/ "));
 
-        const wishList = JSON.parse(await readFile(outputFilePath));
+        const wishList = await readFile(outputFilePath);
 
         const wishListItems = wishList.wishlist.items;
 
@@ -187,8 +199,8 @@ async function deleteItemById() {
 
                 wishListItems.splice(itemToDelete, 1);
 
-                wishListItems.map((item,index) => item.id = index + 1);
-                
+                wishListItems.map((item, index) => item.id = index + 1);
+
                 await writeContentToFile(wishList);
 
             } else {
@@ -218,7 +230,7 @@ async function readFile(filePath) {
 
         }
 
-        return content;
+        return JSON.parse(content);
 
     } catch (error) {
 
@@ -237,7 +249,7 @@ async function writeContentToFile(content) {
 
     } catch (err) {
 
-        console.log("Error writing wishlist.json\n", err);
+        console.error("Error writing wishlist.json\n", err);
 
         return 0;
     }
