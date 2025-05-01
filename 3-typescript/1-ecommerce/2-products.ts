@@ -21,7 +21,7 @@
 
 import { Product, Brand, EnrichedProduct, BrandInfo } from "./1-types";
 
-async function analyzeProductPrices(products: any[]): Promise<any> {
+export async function analyzeProductPrices(products: Product[]): Promise<any> {
 
   type productPick = Pick<Product, "name" | "price" | "onSale">;
 
@@ -129,12 +129,12 @@ async function filterProductsWithOneImage(
   products: Product[],
 ): Promise<unknown[]> {
   // Implement the function logic here
-  
+
   const filteredProducts = products.filter(product => product.images.length > 0).map((product) => {
 
     const [firstImage] = product.images;
     return {
-      
+
       images: firstImage ? [firstImage] : [],
 
     };

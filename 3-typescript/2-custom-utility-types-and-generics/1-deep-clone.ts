@@ -13,24 +13,23 @@
 
 //? implement the function  here
 function deepClone<T>(input: T): T {
-    
-    if (input === null || typeof input !== "object") {
-        return input;
-      }
-    
-      const initialValue: any = Array.isArray(input) ? [] : {};
-    
-      return Object.keys(input).reduce((acumulator, key) => {
 
-        const typedKey = key as keyof T;
-        
-        acumulator[typedKey] = deepClone((input as any)[typedKey]);
-        
-        return acumulator;
-
-      }, initialValue);
-      
+  if (input === null || typeof input !== "object") {
+    return input;
   }
 
+  const initialValue: any = Array.isArray(input) ? [] : {};
 
-  
+  return Object.keys(input).reduce((acumulator, key) => {
+
+    const typedKey = key as keyof T;
+
+    acumulator[typedKey] = deepClone((input as any)[typedKey]);
+
+    return acumulator;
+
+  }, initialValue);
+
+}
+
+

@@ -14,14 +14,14 @@
 
 import { Brand, Product } from "./1-types";
 
-async function getCountriesWithBrandsAndProductCount(
+export async function getCountriesWithBrandsAndProductCount(
   brands: Brand[],
   products: Product[],
-): Promise<Record<string, number>>  {
+): Promise<Record<string, number>> {
 
   const countryProductCountRecord: Record<string, number> = {};
 
-   const brandIdToCountry = new Map(
+  const brandIdToCountry = new Map(
 
     brands.map((brand) => {
 
@@ -29,19 +29,19 @@ async function getCountriesWithBrandsAndProductCount(
 
       const country = parts[1];
 
-      return [Number(brand.id), country] as [number, string];
+      return [Number(brand.id), country] as [typeof brand.id , typeof country];
     })
   );
-  
+
   products.forEach((product) => {
     const country = brandIdToCountry.get(product.brandId);
 
     if (country) {
-      
+
       if (!countryProductCountRecord[country]) {
         countryProductCountRecord[country] = 0;
       }
-      
+
       countryProductCountRecord[country]++;
     }
   });

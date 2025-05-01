@@ -19,14 +19,14 @@ async function getDepartmentsWithProductCount(
 ): Promise<DepartmentProductInfo[]> {
   // Implement the function logic here
   return departments.map(function (deapartment) {
-    
+
     const relatedProducts = products.filter(
 
       product => product.departmentId === deapartment.id,
 
     );
 
-   return {
+    return {
       id: deapartment.id,
       name: deapartment.name,
       productCount: relatedProducts.length,

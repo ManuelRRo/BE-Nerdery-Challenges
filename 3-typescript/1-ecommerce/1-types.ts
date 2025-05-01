@@ -16,9 +16,6 @@
  * - The use of interfaces and type aliases to create a clear and maintainable structure
  */
 
-
-type ArrayType<T> = T[];
-
 // PRODUCTS JSON
 
 //! Add necessary type definitions for the products json file
@@ -29,7 +26,7 @@ type Image = {
     isMain: boolean;
 };
 
-type  Specifications = {
+type  Specification = {
     material: string;
     weight: string;
     cushioning: string;
@@ -42,7 +39,7 @@ export type  Product  =  {
     name: string;
     departmentId: number;
     categoryId: number;
-    brandId: number;
+    brandId: number | string;
     linkId: string;
     refId: string;
     isVisible: boolean;
@@ -56,29 +53,29 @@ export type  Product  =  {
     metaTagDescription: string;
     supplierId: number;
     showWithoutStock: boolean;
-    asWordsRemarketingCode: string;
-    lomadeeCampaingCode: string;
+    adWordsRemarketingCode: string;
+    lomadeeCampaignCode: string;
     score: number;
     price: number;
     salePrice: number;
     onSale: boolean;
-    colors: ArrayType<string>;
-    sizes: ArrayType<number>;
-    tags: ArrayType<string>;
-    images: ArrayType<Image>;
-    specifications: Specifications;
+    colors: string[];
+    sizes: number[];
+    tags: string[];
+    images: Image[];
+    specification: Specification;
 }
 
 
 // CATEGORIES JSON
 
 //! Add necessary type definitions for the brands json file
-interface Filter {
+export interface Filter {
     name:string;
-    values: ArrayType<string>;
+    values: string[];
 }
 
-interface Category {
+export interface Category {
     id:number;
     name: string;
     departmentId: number;
@@ -89,7 +86,7 @@ interface Category {
     bannerUrl: string;
     displayOrder: number;
     metaDescription :string;
-    filters :Filter;
+    filters :Filter[];
 }
 
 
