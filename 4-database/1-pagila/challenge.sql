@@ -8,9 +8,15 @@
     - Results should be grouped by category name
  */
 
-
 -- your query here
 
+SELECT c.name AS category ,COUNT(*) AS film_count 
+
+FROM public.category c INNER JOIN public.film_category fc 
+
+ON fc.category_id = c.category_id
+
+GROUP BY c.name;
 
  /*
     Challenge 2.
@@ -22,8 +28,17 @@
  */
 
  -- your query here
+SELECT c.first_name,c.last_name,SUM(p.amount) as total_price
 
+FROM public.payment p INNER JOIN public.customer c
 
+ON p.customer_id = c.customer_id
+
+GROUP BY c.customer_id 
+
+ORDER BY total_price DESC 
+
+FETCH FIRST 5 ROW ONLY;
 
 
 /*
