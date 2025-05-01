@@ -28,7 +28,7 @@ GROUP BY c.name;
  */
 
  -- your query here
-SELECT c.first_name,c.last_name,SUM(p.amount) as total_price
+SELECT c.first_name,c.last_name,SUM(p.amount) as total_spent
 
 FROM public.payment p INNER JOIN public.customer c
 
@@ -36,7 +36,7 @@ ON p.customer_id = c.customer_id
 
 GROUP BY c.customer_id 
 
-ORDER BY total_price DESC 
+ORDER BY total_spent DESC 
 
 FETCH FIRST 5 ROW ONLY;
 
