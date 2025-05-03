@@ -25,9 +25,7 @@ export async function getCountriesWithBrandsAndProductCount(
 
     brands.map((brand) => {
 
-      const parts = brand.headquarters.split(",").map(part => part.trim());
-
-      const country = parts[1];
+      const [, country] = brand.headquarters.split(",").map(part => part.trim());
 
       return [Number(brand.id), country] as [typeof brand.id , typeof country];
     })
