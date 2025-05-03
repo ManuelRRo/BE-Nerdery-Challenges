@@ -115,7 +115,7 @@ const todo: MyReadOnly<Todo> = {
  */
 
 // Add here your solution
-type MyReturnType<T> = T extends (...args: any) => infer R ? R : any;
+type MyReturnType<T> = T extends (...args: any) => infer R ? R : never;
 // Add here your example
 const fn = (v: boolean) => {
   if (v) {
