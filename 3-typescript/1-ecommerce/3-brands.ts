@@ -12,10 +12,37 @@
  * - The return should be a type that allow us to define the country name as a key and the amount of products as a value.
  */
 
-async function getCountriesWithBrandsAndProductCount(
-  brands: unknown[],
-  products: unknown[],
-): Promise<unknown> {
-  // Implement the function logic here
-  return;
+import { Brand, Product } from "./1-types";
+
+export async function getCountriesWithBrandsAndProductCount(
+  brands: Brand[],
+  products: Product[],
+): Promise<Record<string, number>> {
+
+  const countryProductCountRecord: Record<string, number> = {};
+
+  const brandIdToCountry = new Map(
+
+    brands.map((brand) => {
+
+      const [, country] = brand.headquarters.split(",").map(part => part.trim());
+
+      return [Number(brand.id), country] as [typeof brand.id , typeof country];
+    })
+  );
+
+  products.forEach((product) => {
+    const country = brandIdToCountry.get(product.brandId);
+
+    if (country) {
+
+      if (!countryProductCountRecord[country]) {
+        countryProductCountRecord[country] = 0;
+      }
+
+      countryProductCountRecord[country]++;
+    }
+  });
+
+  return countryProductCountRecord;
 }

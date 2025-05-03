@@ -19,7 +19,48 @@
  *
  **/
 
-async function analyzeProductPrices(products: any[]): Promise<any> {}
+import { Product, Brand, EnrichedProduct, BrandInfo, productPick, analyzedProducts } from "./1-types";
+
+export async function analyzeProductPrices(products: Product[]): Promise<analyzedProducts> {
+
+  
+
+if (products.length === 0) {
+    throw new Error("Product list cannot be empty")
+  }
+  const onSaleProducts = products.filter(p => p.onSale);
+
+  let mostExpensiveProduct = products[0];
+
+  let cheapestProduct: productPick = products[0];
+
+  const totalPrice = products.reduce((total, product) => total + product.price, 0);
+
+  const averagePrice = parseFloat((totalPrice / products.length).toFixed(2)); // 2 decimal
+
+  for (const product of products) {
+    if (product.price > mostExpensiveProduct.price) {
+      mostExpensiveProduct = product;
+    }
+    if (product.price < cheapestProduct.price) {
+      cheapestProduct = product;
+    }
+  }
+
+  const onSaleCount = onSaleProducts.length;
+
+  let averageDiscount: number = 0;
+
+  if (onSaleCount > 0) {
+    averageDiscount = onSaleProducts.reduce((sum, onSaleProduct) => (onSaleProduct.price-onSaleProduct.salePrice),0) / onSaleProducts.length;
+
+  }
+  const Analysis: analyzedProducts = {
+    
+    totalPrice, averagePrice, mostExpensiveProduct, cheapestProduct, onSaleCount, averageDiscount
+  }
+  return Analysis; 
+}
 
 /**
  *  Challenge 2: Build a Product Catalog with Brand Metadata
@@ -36,10 +77,29 @@ async function analyzeProductPrices(products: any[]): Promise<any> {}
  */
 
 async function buildProductCatalog(
-  products: unknown[],
-  brands: unknown[],
-): Promise<unknown[]> {
-  return [];
+  products: Product[],
+  brands: Brand[],
+): Promise<EnrichedProduct[]> {
+
+  const EnrichedProducts: EnrichedProduct[] = [];
+
+  const activeBrands = brands.filter((brand) => brand.isActive);
+
+  const activeProducts = products.filter((product) => product.isActive);
+
+  activeProducts.forEach(product => {
+    const brand = activeBrands.find(brand => brand.id === product.brandId)
+    if (brand) {
+      const enrichedProduct: EnrichedProduct = {
+        ...product,
+        brandInfo : brand
+      };
+      EnrichedProducts.push(enrichedProduct);
+    }
+  });
+
+  return EnrichedProducts;
+
 }
 
 /**
@@ -57,9 +117,19 @@ async function buildProductCatalog(
  */
 
 async function filterProductsWithOneImage(
-  products: unknown[],
-): Promise<unknown[]> {
+  products: Product[],
+): Promise<Product[]> {
   // Implement the function logic here
 
-  return [];
+  const filteredProducts = products.filter(product => product.images.length > 0).map((product) => {
+    
+    return {
+        ... product,
+        images: [product.images[0]]
+
+    };
+
+  });
+
+  return filteredProducts;
 }
