@@ -65,6 +65,17 @@ export type  Product  =  {
     images: Image[];
     specification: Specification;
 }
+export type productPick = Pick<Product, "name" | "price" | "onSale">;
+
+export type analyzedProducts = {
+    totalPrice: number;
+    averagePrice: number;
+    mostExpensiveProduct: productPick;
+    cheapestProduct: productPick;
+    onSaleCount: number;
+    averageDiscount: number;
+  }
+
 
 
 // CATEGORIES JSON
@@ -117,7 +128,7 @@ export type Brand = {
 export type BrandInfo = Omit<Brand,"id" | "isActive">;
 
 
-export type EnrichedProduct = Product & {
+export type EnrichedProduct = Omit<Product,"brandId"> & {
     brandInfo: BrandInfo
 }
 

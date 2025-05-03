@@ -19,28 +19,20 @@
  *
  **/
 
-import { Product, Brand, EnrichedProduct, BrandInfo } from "./1-types";
+import { Product, Brand, EnrichedProduct, BrandInfo, productPick, analyzedProducts } from "./1-types";
 
-export async function analyzeProductPrices(products: Product[]): Promise<any> {
+export async function analyzeProductPrices(products: Product[]): Promise<analyzedProducts> {
 
-  type productPick = Pick<Product, "name" | "price" | "onSale">;
+  
 
-  type analyzedProducts = {
-    totalPrice: number;
-    averagePrice: number;
-    mostExpensiveProduct: productPick;
-    cheapestProduct: productPick;
-    onSaleCount: number;
-    averageDiscount: number;
-  }
-
-  let mostExpensiveProduct = products[0] as productPick;
-
-  let cheapestProduct: productPick = products[0] as productPick;
-
-  if (products.length === 0) {
+if (products.length === 0) {
     throw new Error("Product list cannot be empty")
   }
+  const onSaleProducts = products.filter(p => p.onSale);
+
+  let mostExpensiveProduct = products[0];
+
+  let cheapestProduct: productPick = products[0];
 
   const totalPrice = products.reduce((total, product) => total + product.price, 0);
 
@@ -55,19 +47,19 @@ export async function analyzeProductPrices(products: Product[]): Promise<any> {
     }
   }
 
-  const onSaleProducts = products.filter(p => p.onSale);
-
   const onSaleCount = onSaleProducts.length;
 
   let averageDiscount: number = 0;
 
   if (onSaleCount > 0) {
-    averageDiscount = onSaleProducts.reduce((sum, p) => sum + ((p.price - (p as any).salePrice) / p.price) * 100, 0);
+    averageDiscount = onSaleProducts.reduce((sum, onSaleProduct) => (onSaleProduct.price-onSaleProduct.salePrice),0) / onSaleProducts.length;
+
   }
-  return {
+  const Analysis: analyzedProducts = {
+    
     totalPrice, averagePrice, mostExpensiveProduct, cheapestProduct, onSaleCount, averageDiscount
   }
-
+  return Analysis; 
 }
 
 /**
@@ -89,7 +81,7 @@ async function buildProductCatalog(
   brands: Brand[],
 ): Promise<EnrichedProduct[]> {
 
-  const EnrichedProducts: EnrichedProduct[] = new Array();
+  const EnrichedProducts: EnrichedProduct[] = [];
 
   const activeBrands = brands.filter((brand) => brand.isActive);
 
@@ -98,10 +90,9 @@ async function buildProductCatalog(
   activeProducts.forEach(product => {
     const brand = activeBrands.find(brand => brand.id === product.brandId)
     if (brand) {
-      const { id, isActive, ...brandInfo } = brand;
       const enrichedProduct: EnrichedProduct = {
         ...product,
-        brandInfo
+        brandInfo : brand
       };
       EnrichedProducts.push(enrichedProduct);
     }
@@ -127,17 +118,17 @@ async function buildProductCatalog(
 
 async function filterProductsWithOneImage(
   products: Product[],
-): Promise<unknown[]> {
+): Promise<Product[]> {
   // Implement the function logic here
 
   const filteredProducts = products.filter(product => product.images.length > 0).map((product) => {
-
-    const [firstImage] = product.images;
+    
     return {
-
-      images: firstImage ? [firstImage] : [],
+        ... product,
+        images: [product.images[0]]
 
     };
+
   });
 
   return filteredProducts;
