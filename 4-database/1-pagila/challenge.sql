@@ -16,6 +16,8 @@ FROM
     fc.category_id = c.category_id
 GROUP BY
     c.name;
+ORDER BY 
+    c.name
 
 /*
 Challenge 2.
@@ -38,8 +40,7 @@ GROUP BY
     c.customer_id
 ORDER BY
     total_spent DESC
-FETCH FIRST
-    5 ROW ONLY;
+LIMIT 5
 
 /*
 Challenge 3.
@@ -72,34 +73,19 @@ WHERE
     - title should display the name of each film that has never been rented
     - inventory_id should show the inventory ID of the specific copy
      */
-    -- your query here
-WITH
-    films_with_no_rentals AS (
-        SELECT
-            i.film_id,
-            i.inventory_id
-        FROM
-            public.rental r FULL OUTER JOIN public.inventory i 
-        ON 
-            r.inventory_id = i.inventory_id
-        WHERE
-            i.inventory_id NOT IN (
-                SELECT
-                    inventory_id
-                FROM
-                    rental
-            )
-        GROUP BY
-            i.film_id,
-            i.inventory_id
-    )
+    -- your query here 
+
 SELECT
     f.title,
-    fwnr.inventory_id
+    i.inventory_id
 FROM
-    public.film f INNER JOIN films_with_no_rentals fwnr 
+    public.film f JOIN public.inventory i 
 ON 
-    f.film_id = fwnr.film_id;
+    f.film_id = i.film_id LEFT JOIN public.rental r 
+ON 
+    i.inventory_id = r.inventory_id
+WHERE
+    r.rental_id IS NULL;
     /*
     Challenge 5.
     Write a SQL query that lists all films that were rented more times than the average rental count per film in the Pagila database.
@@ -107,37 +93,36 @@ ON
     - title should display the name of each film
     - rental_count should show the total number of times the film was rented
      */
-    -- your query here
-WITH movies_count_rented AS(
-
-	SELECT 
-        i.film_id,
-        COUNT(*) as times_rented
-	FROM
-        public.rental r INNER JOIN public.inventory i
-	ON 
-        r.inventory_id = i.inventory_id
-	GROUP BY 
-        i.film_id
-	ORDER BY 
-        i.film_id
-
-), average_count_rented AS(
+    -- your query here 
 SELECT 
-	AVG(times_rented)::numeric(10,0) AS average_rental_count 
+    f.title,
+    COUNT(*) AS times_rented
 FROM 
-	movies_count_rented
-)
-SELECT 
-    f.title, mcr.times_rented
-FROM 
-    public.film f JOIN movies_count_rented mcr
+    public.film f JOIN public.inventory i 
 ON 
-    f.film_id=mcr.film_id
-WHERE 
-    times_rented > ( SELECT * FROM average_count_rented)
+    f.film_id = i.film_id JOIN public.rental r 
+ON 
+    i.inventory_id = r.inventory_id
+GROUP BY 
+    f.film_id, f.title
+HAVING 
+    COUNT(*) > (
+        SELECT 
+            AVG(rental_count)::numeric(10,0)
+        FROM (
+            SELECT 
+                COUNT(*) AS rental_count
+            FROM 
+                public.inventory i2 JOIN public.rental r2 
+            ON 
+                i2.inventory_id = r2.inventory_id
+            GROUP BY 
+                i2.film_id
+        ) AS sub_avg
+    )
 ORDER BY 
-    mcr.times_rented DESC;
+    times_rented DESC;
+
 
     /*
 Challenge 6.
@@ -170,7 +155,7 @@ Find all *customers who have not rented movies from *every available genre*.
 - The result should include the customer's first_name and last_name
 - Only include customers who are missing at least one genre in their rental history
     */
--- your query here
+-- your query here COUNT,CUSTOMER_ID, film,inventory,category
 
 WITH total_count_of_genres AS (
 	SELECT 
@@ -206,6 +191,7 @@ WHERE cgr.genre_rented < (
 ORDER BY 
 	c.last_name,
     c.first_name
+
 /*
 Bonus Challenge 8 (opt)
 Find the Top 3 Most Frequently Rented Films in Each Category and Their Total Rental Revenue.

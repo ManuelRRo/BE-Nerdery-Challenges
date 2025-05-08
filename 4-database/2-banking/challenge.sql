@@ -56,7 +56,7 @@ DECLARE
    transaction_reference UUID := gen_random_uuid();
 BEGIN
     IF from_id = to_id THEN
-        RAISE EXCEPTION 'Transaction not allowed: id for both accounts is the same.';
+        RAISE EXCEPTION 'Transaction not allowed: id for both accounts is the same.(from id and id  must be different,how can fix the issue)';
     END IF;	
 
     IF amount <= 0 THEN
@@ -134,3 +134,4 @@ BEGIN
     END;
 END;
 $$ language plpgsql;
+-- extra message optional for succes transaction
