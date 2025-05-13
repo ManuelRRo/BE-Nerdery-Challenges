@@ -1,16 +1,23 @@
 version: "3.9"
 
 services:
+  pgadmin:
+    container_name: pgadmin-web
+    image: dpage/pgadmin4
+    volumes:
+     - ./pgadmin_data:/var/lib/pgadmin
+    env_file: .env
+    ports:
+      - "15001:80"
+    depends_on:
+      - postgres-sample
   postgres-sample:
     image: postgres:17
     container_name: postgres-sample
-    environment:
-      POSTGRES_PASSWORD: pass_nerdery
-      POSTGRES_USER: postgres
-      POSTGRES_DB: nerdery_db
+    env_file: .env
     restart: always
     ports:
-      - 5432:5432
+      - 15000:5432
       # add your port in case you have 5432 in use e.g 5434:5432 for 5434
     volumes:
       - ./init.db:/docker-entrypoint-initdb.d

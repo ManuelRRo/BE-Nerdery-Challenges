@@ -41,3 +41,97 @@
 
 
 -- your solution here
+
+CREATE OR REPLACE FUNCTION transfer_funds (
+	from_id INT, 
+	to_id INT, 
+	amount NUMERIC
+) RETURNS VOID as $$
+DECLARE
+   is_same_account boolean;
+   sender_balance NUMERIC;
+   sender_status TEXT;
+   recipient_status TEXT;
+   account_balance NUMERIC;
+   transaction_reference UUID := gen_random_uuid();
+BEGIN
+    IF from_id = to_id THEN
+        RAISE EXCEPTION 'Transaction not allowed: id for both accounts is the same.(from id and id  must be different,how can fix the issue)';
+    END IF;	
+
+    IF amount <= 0 THEN
+        RAISE EXCEPTION 'Transaction not allowed: the transfer amount must be greater than zero';
+    END IF;
+
+    SELECT 
+        balance, 
+        status
+    INTO 
+        sender_balance, 
+        sender_status
+    FROM 
+        banking.accounts ba
+    WHERE 
+        ba.account_id = from_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Account with (ID: %) Not found', from_id ;
+    END IF;
+
+    IF sender_status = 'frozen' THEN
+        RAISE EXCEPTION 'origin account frozen (ID: %)', from_id;
+    END IF;
+
+    SELECT 
+        status
+    INTO 
+        recipient_status
+    FROM 
+        banking.accounts
+    WHERE 
+        account_id = to_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Account with (ID: %) Not found', to_id;
+    END IF;
+
+    IF recipient_status = 'frozen' THEN
+        RAISE EXCEPTION 'recipient account frozen (ID: %)', to_id;
+    END IF;
+
+    IF sender_balance < amount THEN
+        RAISE EXCEPTION 'sender has not sufficient funds';
+    END IF;
+
+    BEGIN
+        
+        UPDATE 
+            banking.accounts
+        SET 
+            balance = balance - amount
+        WHERE 
+            account_id = from_id;
+        
+        UPDATE 
+            banking.accounts
+        SET 
+            balance = balance + amount
+        WHERE 
+            account_id = to_id;
+        
+        INSERT INTO banking.transactions (
+            account_id, 
+            amount, 
+            transaction_type, 
+            reference, 
+            transaction_date
+        ) VALUES 
+            (from_id, amount, 'withdrawal', transaction_reference, NOW()),
+            (to_id, amount, 'deposit', transaction_reference, NOW());
+    EXCEPTION 
+        WHEN OTHERS THEN
+            RAISE EXCEPTION 'An error occur transaction not executing: %', SQLERRM;
+    END;
+END;
+$$ language plpgsql;
+-- extra message optional for succes transaction
